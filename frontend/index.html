@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <title>Escolha sua Modalidade</title>
+    <link rel="stylesheet" href="style_modalidade.css">
+    <link rel="stylesheet" href="style_fundo.css">
+</head>
+<body>
+    <div class="background-container">
+        <img src="imagens/fundo1.jpg" alt="Fundo 1" class="background-image active">
+        <img src="imagens/fundo2.jpg" alt="Fundo 2" class="background-image">
+        <img src="imagens/fundo3.jpg" alt="Fundo 3" class="background-image">
+        <img src="imagens/fundo4.jpg" alt="Fundo 4" class="background-image">
+        </div>
+
+    <div class="modal-box">
+        <h2>Qual sua modalidade?</h2>
+        <input type="text" id="nomeUsuario" placeholder="Digite seu nome" style="margin-bottom: 10px;">
+        <select id="tipoUsuario">
+            <option value="">-- Selecione --</option>
+            <option value="carro">Carro</option>
+            <option value="moto">Moto</option>
+            <option value="visitante">Visitante (QG)</option>
+        </select>
+        <button onclick="entrarMapa()">Entrar no mapa</button>
+    </div>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // Botão "Entrar no mapa"
+        window.entrarMapa = function () {
+            const tipoSelecionado = document.getElementById("tipoUsuario").value;
+            const nomeInserido = document.getElementById("nomeUsuario").value;
+
+            if (!tipoSelecionado) {
+                alert("Selecione uma opção para continuar.");
+                return;
+            }
+
+            if (!nomeInserido) {
+                alert("Digite seu nome para continuar.");
+                return;
+            }
+
+            // Salvar os dados no localStorage (para o mapa usar)
+            localStorage.setItem("tipoUsuario", tipoSelecionado);
+            localStorage.setItem("nomeUsuario", nomeInserido);
+
+            // Ir para o mapa
+            window.location.href = "mapa.html";
+        }
+    });
+</script>
+
+
+
+    <script src="script2.js"></script>
+</body>
+</html>

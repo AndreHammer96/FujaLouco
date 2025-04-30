@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link rel="icon" href="imagens/logo.png" type="image/png">
+  <meta charset="UTF-8">
+  <title>MAPA TCHA</title>
+  <link rel="stylesheet" href="leaflet/leaflet.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>
+      <img src="imagens/logo2.png" alt="Logo">
+      MAPA PROS ENIGMAS
+    </h1>
+  </header>
+
+  <button id="toggle-menu">✖</button> <!-- botão aqui, fora do aside -->
+
+  <main>
+    <aside>
+      <!-- 🔍 Campo de filtro com botão de limpar -->
+
+	  <div style="position: relative; display: flex; align-items: center;">
+  <div style="position: relative; width: 80%;">
+    <input type="text" id="filtro" placeholder="Buscar referência..." style="width: 75%; padding-right: 30px;">
+    <button id="limpar-filtro" style="
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      border: none;
+      font-size: 13px;
+      cursor: pointer;
+      display: none;
+      color: #666;
+    ">❌</button>
+  </div>
+</div>
+
+
+      <ul id="lista-referencias">
+        <!-- preenchido via script.js -->
+      </ul>
+    </aside>
+
+    <div id="map"></div>
+  </main>
+
+  <script src="leaflet/leaflet.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

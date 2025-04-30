@@ -1,0 +1,66 @@
+body {
+  margin: 0;
+  font-family: sans-serif;
+}
+
+header {
+  background-color: #ffce00;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+header h1 {
+  display: flex;
+  align-items: center;
+  font-size: 24px;
+  margin: 0;
+}
+
+header img {
+  height: 40px;
+  margin-right: 10px;
+  vertical-align: middle;
+}
+
+main {
+  display: flex;
+  height: calc(100vh - 60px);
+}
+
+aside {
+  width: 250px;
+  background: #111;
+  color: white;
+  padding: 1rem;
+  overflow-y: auto;
+  transition: all 0.3s ease;
+}
+
+aside.hidden {
+  display: none;
+}
+
+#map {
+  flex: 1;
+  height: 100%;
+  position: relative; /* importante para posicionar o botão interno */
+}
+
+/* Botão de esconder menu */
+#toggle-menu {
+  position: absolute;
+  top: 70px;
+  left: 260px;
+  z-index: 1000;
+  background-color: #ffce00;
+  border: none;
+  font-size: 18px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+  transition: left 0.3s ease;
+}

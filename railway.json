@@ -1,0 +1,9 @@
+{
+  "build": {
+    "command": "npm install --prefix backend",
+    "output": "frontend"
+  },
+  "deploy": {
+    "command": "npm start --prefix backend"
+  }
+}
