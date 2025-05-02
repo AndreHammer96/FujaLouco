@@ -1,4 +1,13 @@
+const http = require('http');
 const WebSocket = require('ws');
+
+// Cria um servidor HTTP
+const server = http.createServer((req, res) => {
+  res.writeHead(200, { 'Content-Type': 'text/plain' });
+  res.end('Servidor WebSocket funcionando');
+});
+
+// Cria um servidor WebSocket
 const wss = new WebSocket.Server({ server });
 
 const users = new Map(); // Armazena todos os usuários
@@ -51,3 +60,8 @@ function broadcastUsers() {
     }
   });
 }
+
+// Inicia o servidor HTTP na porta 8001
+server.listen(8001, () => {
+  console.log('Servidor WebSocket rodando na porta 8001');
+});
