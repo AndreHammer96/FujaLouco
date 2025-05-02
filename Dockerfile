@@ -1,39 +1,15 @@
-# Etapa de build
-FROM node:18 AS build
+# Usa imagem com Python 3.10
+FROM python:3.10-slim
 
-# Define o diretório de trabalho para a etapa de build
+# Define o diretório de trabalho
 WORKDIR /app
 
-# Copia os arquivos de dependência do backend e instala as dependências
-COPY backend/package.json backend/package-lock.json* ./backend/
-WORKDIR /app/backend
-RUN npm install
+# Copia todos os arquivos do projeto para dentro da imagem Docker
+COPY . .
 
-# Volta para o diretório de trabalho raiz da etapa de build
-WORKDIR /app
+# Expõe as portas usadas pelo servidor HTTP e WebSocket
+EXPOSE 8000
+EXPOSE 8001
 
-# Copia a pasta frontend para a raiz do diretório de trabalho da etapa de build
-COPY frontend ./frontend
-
-# Copia o restante dos arquivos do backend
-COPY backend ./backend
-
-# Etapa de produção
-FROM node:18
-
-WORKDIR /app
-
-# Copia a pasta backend da etapa de build
-COPY --from=build /app/backend /app/backend
-
-# Copia a pasta frontend da etapa de build
-COPY --from=build /app/frontend /app/frontend
-
-# Lista a estrutura de arquivos (para debug) NA ETAPA DE PRODUÇÃO
-RUN ls -R /app
-
-# Expõe a porta
-EXPOSE 3000
-
-# Comando para iniciar a aplicação
-CMD ["node", "backend/server.js"]
+# Comando que roda o servidor HTTP (para os arquivos estáticos) e o servidor WebSocket
+CMD ["sh", "-c", "python3 -m http.server 8000 & python3 backend/websocket_server.py"]
