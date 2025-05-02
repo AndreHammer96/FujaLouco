@@ -39,7 +39,7 @@ function getVehicleIcon(vehicleType) {
 }
 // 4. Função WebSocket mais robusta
 function setupWebSocket() {
-    socket = new WebSocket('ws://fujalouco-production.up.railway.app');
+    socket = new WebSocket('ws://fujalouco-production.up.railway.app/mapa.html');
 
     socket.onopen = () => {
         console.log('Conectado ao servidor WebSocket');
