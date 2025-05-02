@@ -39,7 +39,7 @@ function getVehicleIcon(vehicleType) {
 }
 // 4. Função WebSocket mais robusta
 function setupWebSocket() {
-    socket = new WebSocket('wss://${location.host}/ws');
+    socket = new WebSocket(`wss://${location.host}/ws`);
 
     socket.onopen = () => {
         console.log('Conectado ao servidor WebSocket');
