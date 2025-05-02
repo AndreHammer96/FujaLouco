@@ -1,41 +1,53 @@
-const express = require("express");
-const http = require("http");
-const WebSocket = require("ws");
-const cors = require("cors");
-const path = require("path");
-
-const app = express();
-app.use(cors());
-
-// Log de todas as rotas adicionadas
-app.use((req, res, next) => {
-  console.log(`Rota sendo acessada: ${req.method} ${req.url}`);
-  next();
-});
-
-const server = http.createServer(app);
+const WebSocket = require('ws');
 const wss = new WebSocket.Server({ server });
 
-let clients = [];
+const users = new Map(); // Armazena todos os usuários
 
-wss.on("connection", (ws) => {
-  // ... seu código WebSocket ...
+wss.on('connection', (ws) => {
+  console.log('Nova conexão WebSocket');
+  
+  ws.on('message', (message) => {
+    try {
+      const data = JSON.parse(message);
+      
+      if (data.type === 'updateLocation') {
+        // Atualiza a posição do usuário
+        users.set(data.userId, {
+          position: data.position,
+          vehicle: data.vehicle,
+          name: data.name
+        });
+        
+        // Envia a lista ATUALIZADA para TODOS conectados
+        broadcastUsers();
+      }
+    } catch (e) {
+      console.error('Erro na mensagem:', e);
+    }
+  });
+
+  ws.on('close', () => {
+    console.log('Usuário desconectado');
+    users.delete(ws.userId);
+    broadcastUsers();
+  });
+
+  // Envia os usuários existentes para a nova conexão
+  ws.send(JSON.stringify({
+    type: 'initialUsers',
+    users: Array.from(users.entries())
+  }));
 });
 
-function broadcastLocations() {
-  // ... sua função broadcastLocations ...
+function broadcastUsers() {
+  const usersData = JSON.stringify({
+    type: 'updateUsers',
+    users: Array.from(users.entries())
+  });
+  
+  wss.clients.forEach(client => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(usersData);
+    }
+  });
 }
-
-app.use(express.static(path.join(__dirname, "../frontend")));
-
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/index.html"));
-});
-
-// Log das rotas definidas
-console.log("Rotas definidas:", app._router.stack.filter(r => r.route).map(r => r.route.path));
-
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-  console.log("Servidor rodando na porta " + PORT);
-});

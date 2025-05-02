@@ -50,5 +50,37 @@
 
   <script src="leaflet/leaflet.js"></script>
   <script src="script.js"></script>
+  <div id="centralizar-btn" title="Centralizar no local atual">📍</div>
+
+<script>
+  // Esta variável será atualizada em tempo real com sua posição
+  let posicaoAtual = null;
+
+  // Ativamos o rastreamento contínuo ao carregar o mapa
+  navigator.geolocation.watchPosition(
+    (position) => {
+      posicaoAtual = [position.coords.latitude, position.coords.longitude];
+    },
+    (error) => {
+      console.error('Erro ao rastrear localização:', error);
+    },
+    {
+      enableHighAccuracy: false,
+      timeout: 20000,
+      maximumAge: 0
+    }
+  );
+
+  // Botão centralizar agora usa a posição já rastreada
+  document.getElementById('centralizar-btn').addEventListener('click', () => {
+    if (posicaoAtual) {
+      mapa.setView(posicaoAtual, 17);
+    } else {
+      alert('Ainda não foi possível obter sua localização. Tente novamente em alguns segundos.');
+    }
+  });
+</script>
+
+
 </body>
 </html>
