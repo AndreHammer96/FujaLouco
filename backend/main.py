@@ -6,7 +6,6 @@ import json
 from datetime import datetime
 import os
 
-app = FastAPI()
 
 # Servir arquivos estáticos do frontend
 app.mount("/frontend", StaticFiles(directory="frontend"), name="frontend")
@@ -46,3 +45,8 @@ async def websocket_endpoint(websocket: WebSocket):
     except WebSocketDisconnect:
         print(f"{datetime.now().isoformat()} - Cliente desconectado: {client_id}")
         del connected_clients[client_id]
+        
+@app.get("/health")
+app = FastAPI()
+async def health():
+    return {"status": "ok"}
