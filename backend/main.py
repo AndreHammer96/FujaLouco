@@ -1,3 +1,25 @@
+import logging
+import sys
+import os
+
+logging.basicConfig(level=logging.INFO, stream=sys.stdout)
+logger = logging.getLogger(__name__)
+
+logger.info("Início do script main.py")
+logger.info(f"Diretório de trabalho: {os.getcwd()}")
+logger.info(f"Conteúdo do diretório: {os.listdir()}")
+
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request
+from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+import json
+from datetime import datetime
+
+app = FastAPI()
+
+# ... restante do seu código ...
+
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 # from fastapi.websockets import WebSocket, WebSocketDisconnect
