@@ -12,4 +12,4 @@ EXPOSE 8000
 EXPOSE 8001
 
 # Comando que roda o servidor HTTP (para os arquivos estáticos) e o servidor WebSocket
-CMD ["sh", "-c", "python3 -m http.server 8000 & python3 backend/websocket_server.py"]
+CMD ["sh", "-c", "python3 -m http.server 8000 & python3 websocket_server.py"]
