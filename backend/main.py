@@ -1,11 +1,16 @@
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import json
 from datetime import datetime
 import os
+import logging
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+app = FastAPI()
 
 # Servir arquivos estáticos do frontend
 app.mount("/frontend", StaticFiles(directory="frontend"), name="frontend")
@@ -28,7 +33,7 @@ async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     client_id = str(id(websocket))
     connected_clients[client_id] = {'ws': websocket, 'last_data': None}
-    print(f"{datetime.now().isoformat()} - Conectado: {client_id}")
+    logger.info(f"{datetime.now().isoformat()} - Conectado: {client_id}")
 
     try:
         while True:
@@ -40,13 +45,15 @@ async def websocket_endpoint(websocket: WebSocket):
                 for cid, client in connected_clients.items():
                     if cid != client_id:
                         await client['ws'].send_text(data)
-            except:
-                print("Erro ao processar mensagem")
+            except json.JSONDecodeError:
+                logger.error("Erro ao decodificar mensagem JSON")
+            except Exception as e:
+                logger.error(f"Erro ao processar mensagem: {e}")
     except WebSocketDisconnect:
-        print(f"{datetime.now().isoformat()} - Cliente desconectado: {client_id}")
+        logger.info(f"{datetime.now().isoformat()} - Cliente desconectado: {client_id}")
         del connected_clients[client_id]
-        
-@app.get("/health")
-app = FastAPI()
+
+@app.get("/health", response_class=JSONResponse)
 async def health():
+    logger.info("Health check solicitado")
     return {"status": "ok"}
