@@ -1,7 +1,7 @@
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request
 from fastapi.responses import HTMLResponse, JSONResponse
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
+# from fastapi.staticfiles import StaticFiles
+# from fastapi.templating import Jinja2Templates
 import json
 from datetime import datetime
 import os
@@ -12,21 +12,21 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
-# Servir arquivos estáticos do frontend
-app.mount("/frontend", StaticFiles(directory="frontend"), name="frontend")
+# # Servir arquivos estáticos do frontend
+# app.mount("/frontend", StaticFiles(directory="frontend"), name="frontend")
 
-# Templates do HTML (Jinja precisa disso para renderizar)
-templates = Jinja2Templates(directory="frontend")
+# # Templates do HTML (Jinja precisa disso para renderizar)
+# templates = Jinja2Templates(directory="frontend")
 
 connected_clients = {}
 
 @app.get("/")
 async def get_index(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    return JSONResponse({"message": "Hello World from Root"}) # Alterado para JSONResponse para simplificar
 
 @app.get("/mapa.html")
 async def get_mapa(request: Request):
-    return templates.TemplateResponse("mapa.html", {"request": request})
+    return JSONResponse({"message": "Mapa"}) # Alterado para JSONResponse para simplificar
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
