@@ -27,6 +27,7 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+logger.info(f"Variável de ambiente PORT: {os.environ.get('PORT')}")
 
 app = FastAPI()
 
