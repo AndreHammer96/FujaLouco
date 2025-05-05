@@ -83,5 +83,7 @@ async def main():
         print(f"{datetime.now().isoformat()} - Servidor WebSocket rodando em ws://0.0.0.0:8001")
         await asyncio.Future()  # Executa indefinidamente
 
-if __name__ == "__main__":
-    asyncio.run(main())
+if __name__ == '__main__':
+    socketio.run(app, host='0.0.0.0', port=int(os.environ.get('PORT', 8000)))
+    
+    print(f"🟢 WebSocket Server iniciado em ws://0.0.0.0:{os.getenv('PORT', 8000)}")

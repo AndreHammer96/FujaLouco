@@ -23,5 +23,5 @@ EXPOSE 8000
 EXPOSE 8080
 
 # Comando de inicialização
-CMD ["sh", "-c", "python websocket_server.py & uvicorn file_server:app --port 8080"]
+CMD ["sh", "-c", "python websocket_server.py & uvicorn file_server:app --host 0.0.0.0 --port ${PORT:-8000}"]
 
