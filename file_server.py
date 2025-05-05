@@ -32,7 +32,15 @@ async def serve_spa(full_path: str = ""):
 if __name__ == "__main__":
     import uvicorn
     port = int(os.environ.get("FRONTEND_PORT", 3000))
-    print(f"✅ Pasta do frontend: {frontend_path}")
+    
+    print("="*50)
+    print(f"✅ Frontend path: {frontend_path}")
     print(f"📂 Conteúdo: {os.listdir(frontend_path)}")
-    print(f"🌐 Iniciando servidor em http://0.0.0.0:{port}")
-    uvicorn.run(app, host="0.0.0.0", port=port)
+    print(f"🌐 Iniciando servidor na porta {port}")
+    print("="*50)
+    
+    try:
+        uvicorn.run(app, host="0.0.0.0", port=port)
+    except Exception as e:
+        print(f"❌ ERRO no servidor frontend: {str(e)}")
+        raise
