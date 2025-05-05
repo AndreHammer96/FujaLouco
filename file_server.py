@@ -18,7 +18,8 @@ async def serve_spa(full_path: str):
 
 if __name__ == "__main__":
     import uvicorn
-    port = int(os.environ.get("FRONTEND_PORT", 443))  # 443 como padrão
+    port = int(os.environ.get("FRONTEND_PORT", 3000))  # Porta alterada
+    print(f"🌐 Frontend rodando em http://0.0.0.0:{port}")
     uvicorn.run(app, host="0.0.0.0", port=port)
     
 print("Estrutura do frontend:", os.listdir("frontend"))
