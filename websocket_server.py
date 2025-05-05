@@ -2,6 +2,8 @@ from flask import Flask
 from flask_socketio import SocketIO
 import os
 
+print(f"✅ Variáveis carregadas: PORT={os.getenv('PORT')}, FRONTEND_PORT={os.getenv('FRONTEND_PORT')}")
+
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
