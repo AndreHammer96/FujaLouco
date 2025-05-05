@@ -17,5 +17,5 @@ def handle_disconnect():
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 8000))
-    print(f"✅ Servidor iniciado na porta {port}")
+    print(f"🟢 WebSocket na porta {port}")
     socketio.run(app, host='0.0.0.0', port=port)
