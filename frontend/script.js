@@ -39,11 +39,16 @@ function getVehicleIcon(vehicleType) {
 }
 // 4. Função WebSocket mais robusta
 function setupWebSocket() {
-    socket = new WebSocket('ws://localhost:8001');
+    // Conexão dinâmica que funciona em qualquer ambiente
+    const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+    const host = window.location.host;
+    const wsUrl = protocol + host + '/ws';
+    
+    socket = new WebSocket(wsUrl);
 
     socket.onopen = () => {
         console.log('Conectado ao servidor WebSocket');
-        sendPosition(); // Envia posição imediatamente ao conectar
+        sendPosition();
     };
 
     socket.onmessage = (event) => {

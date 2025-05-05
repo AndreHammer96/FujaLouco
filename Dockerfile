@@ -1,39 +1,27 @@
-# Etapa de build
-FROM node:18 AS build
-
-# Define o diretório de trabalho para a etapa de build
-WORKDIR /app
-
-# Copia os arquivos de dependência do backend e instala as dependências
-COPY backend/package.json backend/package-lock.json* ./backend/
-WORKDIR /app/backend
-RUN npm install
-
-# Volta para o diretório de trabalho raiz da etapa de build
-WORKDIR /app
-
-# Copia a pasta frontend para a raiz do diretório de trabalho da etapa de build
-COPY frontend ./frontend
-
-# Copia o restante dos arquivos do backend
-COPY backend ./backend
-
-# Etapa de produção
-FROM node:18
+FROM python:3.9-slim
 
 WORKDIR /app
 
-# Copia a pasta backend da etapa de build
-COPY --from=build /app/backend /app/backend
+# Adicione após o WORKDIR /app
+RUN mkdir -p /app/frontend/imagens
 
-# Copia a pasta frontend da etapa de build
-COPY --from=build /app/frontend /app/frontend
+# Instala dependências
+COPY requirements.txt .
+RUN pip install -r requirements.txt
 
-# Lista a estrutura de arquivos (para debug) NA ETAPA DE PRODUÇÃO
-RUN ls -R /app
+# Copia TODOS os arquivos
+COPY . .
 
-# Expõe a porta
-EXPOSE 3000
+# Instala servidor HTTP simples para o frontend
+RUN apt-get update && apt-get install -y python3-pip && \
+    pip install fastapi uvicorn aiofiles
 
-# Comando para iniciar a aplicação
-CMD ["node", "backend/server.js"]
+# Porta do Socket.IO (WebSocket)
+EXPOSE 8000
+
+# Porta do frontend HTTP
+EXPOSE 8080
+
+# Comando de inicialização
+CMD ["sh", "-c", "python websocket_server.py & uvicorn file_server:app --port 8080"]
+
