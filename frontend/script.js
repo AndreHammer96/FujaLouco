@@ -1,21 +1,167 @@
 const mapa = L.map('map').setView([-25.7718, -49.7164], 15);
 
-// Camadas de mapa base
+// 1. Primeiro declare TODAS as variáveis globais
+let marcadorUsuario = null;
+let socket = null;
+const outrosUsuarios = {};
+const userId = 'user-' + Math.random().toString(36).substr(2, 9);
+const nomeUsuario = localStorage.getItem("nomeUsuario") || "Usuário";
+const tipoUsuario = localStorage.getItem("tipoUsuario") || "visitante";
+
+// 2. Configuração do Mapa Base
 const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '&copy; OpenStreetMap contributors'
 }).addTo(mapa);
 
-const osmHOT = L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
-  maxZoom: 30,
-  attribution: '© OpenStreetMap contributors, Tiles style by HOT - OSM France'
-});
-
 const baseMaps = {
-  "Modelo 1": osm,
-  "Modelo 2": osmHOT
+  "OpenStreetMap": osm
 };
 
-// Pontos por categoria
+// 3. Ícones
+const icones = {
+  carro: L.icon({
+    iconUrl: 'imagens/carro.png',
+    iconSize: [32, 32],
+    iconAnchor: [16, 32]
+  }),
+  moto: L.icon({
+    iconUrl: 'imagens/moto.png',
+    iconSize: [32, 32],
+    iconAnchor: [16, 32]
+  }),
+  visitante: L.divIcon({
+    html: '<div style="background:blue; width:14px; height:14px; border-radius:50%; border:2px solid white"></div>',
+    iconSize: [20, 20]
+  })
+};
+function getVehicleIcon(vehicleType) {
+    return icones[vehicleType] || icones.visitante;
+}
+// 4. Função WebSocket mais robusta
+function setupWebSocket() {
+    socket = new WebSocket('ws://localhost:8001');
+
+    socket.onopen = () => {
+        console.log('Conectado ao servidor WebSocket');
+        sendPosition(); // Envia posição imediatamente ao conectar
+    };
+
+    socket.onmessage = (event) => {
+    try {
+        const data = JSON.parse(event.data);
+        
+        if (data.type === 'disconnect') {
+            if (outrosUsuarios[data.id]) {
+                mapa.removeLayer(outrosUsuarios[data.id].marker);
+                delete outrosUsuarios[data.id];
+                console.log(`Usuário desconectado: ${data.id}`);
+            }
+            return;
+        }
+
+        if (data.id === userId) return;
+        
+        const now = Date.now();
+        
+        if (!outrosUsuarios[data.id]) {
+            outrosUsuarios[data.id] = {
+                marker: L.marker([data.lat, data.lng], {
+                    icon: getVehicleIcon(data.vehicle)
+                }).addTo(mapa)
+                .bindPopup(`<b>${data.name}</b> (${data.vehicle})`),
+                lastUpdate: now
+            };
+            console.log('Novo marcador criado para:', data.id);
+        } else {
+            outrosUsuarios[data.id].marker.setLatLng([data.lat, data.lng]);
+            outrosUsuarios[data.id].lastUpdate = now;
+            console.log('Marcador atualizado para:', data.id);
+        }
+    } catch (e) {
+        console.error('Erro ao processar mensagem:', e);
+    }
+};
+
+    socket.onerror = (error) => {
+        console.error('Erro no WebSocket:', error);
+    };
+
+    socket.onclose = () => {
+        console.log('Conexão WebSocket fechada. Reconectando em 5s...');
+        setTimeout(setupWebSocket, 5000);
+    };
+}
+function removerInativos() {
+    const now = Date.now();
+    const TIMEOUT = 30000; // 30 segundos sem atualização = inativo
+
+    Object.keys(outrosUsuarios).forEach(id => {
+        if (now - outrosUsuarios[id].lastUpdate > TIMEOUT) {
+            mapa.removeLayer(outrosUsuarios[id].marker);
+            delete outrosUsuarios[id];
+            console.log(`Removido usuário inativo: ${id}`);
+        }
+    });
+}
+
+// Verifica a cada 10 segundos
+setInterval(removerInativos, 10000);
+
+// Função auxiliar para enviar posição
+function sendPosition() {
+    if (!marcadorUsuario) {
+        console.log('Marcador do usuário não está pronto');
+        return;
+    }
+    
+    if (socket?.readyState !== WebSocket.OPEN) {
+        console.log('WebSocket não está conectado');
+        return;
+    }
+
+    const pos = marcadorUsuario.getLatLng();
+    const message = JSON.stringify({
+        type: 'update',
+        id: userId,
+        name: nomeUsuario,
+        vehicle: tipoUsuario,
+        lat: pos.lat,
+        lng: pos.lng,
+        timestamp: Date.now()
+    });
+    
+    console.log('Enviando posição:', message); // Log para depuração
+    socket.send(message);
+}
+
+// 5. Geolocalização corrigida
+function setupGeolocation() {
+  if ("geolocation" in navigator) {
+    navigator.geolocation.watchPosition(
+      (pos) => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+
+        if (!marcadorUsuario) {
+          marcadorUsuario = L.marker([lat, lng], {
+            icon: icones[tipoUsuario] || icones.visitante
+          }).addTo(mapa)
+            .bindPopup(`<b>${nomeUsuario}</b>`);
+          mapa.setView([lat, lng], 16);
+        } else {
+          marcadorUsuario.setLatLng([lat, lng]); // Corrigido: usando lat/lng diretamente
+        }
+
+        sendPosition(); // Envia a posição atualizada
+      },
+      (erro) => console.error("Erro na geolocalização:", erro),
+      { enableHighAccuracy: true }
+    );
+  }
+}
+
+
+// 7. Configuração dos pontos estáticos (mantido igual)
 const locais = [
   { nome: "Quartel General TCHA", coord: [-25.7718, -49.7164], tipo: "QG_TCHA", descricao: "Aqui onde a magia acontece rs.", tags: "2025 leozina arroz feijao" },
   { nome: "Teatro São João", coord: [-25.76803, -49.7171], tipo: "turistico", descricao: "Um teatro histórico." , tags: "antigo"},
@@ -55,13 +201,13 @@ const locais = [
 { nome:"Placa 2ª Guerra mundial", coord:[-25.771187310332955, -49.71655872062561], tipo: "placasestatuas", descricao: "Lapeanos guerra", tags: "Lapeanos que há 45 anos lutaram na europa, em defesa do brasil e pela liberdade no mundo 08 maio 08/05 1990 André Bill Hammerschmidt João Maria Mateus Siben Pinheiro Silva da simborski ukan vieira de oliveira ferreira de lima vaz padilha joaquin josé antonio dos santos berberino dequech josé cardoso oliveira dubiel halaiko kochinski lourenço pimentel pichibonski prestes colaço amaral juvenal juvencio lauro amaral silveira ludovico belinoski kochiba rodrigues ookunski prince sahia diniz ferreira iurkiv pires de lima buen farias padrilha conçalves sebastiao pedro paulo namur miguel"},
 ];
 
-// Agrupar marcadores por categoria
 const grupos = {
   QG_TCHA: L.layerGroup(),
   turistico: L.layerGroup(),
   patrocinio: L.layerGroup(),
   placasestatuas: L.layerGroup()
 };
+
 const iconesPorTipo = {
   QG_TCHA: L.icon({
     iconUrl: 'imagens/pin1.png',
@@ -85,40 +231,30 @@ const iconesPorTipo = {
   })
 };
 
-
-
 locais.forEach(local => {
-  // Escolhe o ícone de acordo com o tipo
   let iconePersonalizado = iconesPorTipo[local.tipo] || undefined;
-
   const marcador = L.marker(local.coord, {
     icon: iconePersonalizado
   }).bindPopup(`<b>${local.nome}</b><br>${local.descricao}<br>${local.coord}`);
 
-  // Adiciona ao grupo correto
   if (grupos[local.tipo]) {
     grupos[local.tipo].addLayer(marcador);
   }
 
-  // Cria item na lista lateral
   const item = document.createElement("li");
   item.textContent = local.nome;
   item.textContent2 = local.descricao;
   item.textContent3 = local.tipo;
   item.textContent4 = local.tags;
-  item._marcador = marcador; // << ADICIONADO
+  item._marcador = marcador;
   item.onclick = () => mapa.setView(local.coord, 17);
   document.getElementById("lista-referencias").appendChild(item);
 });
 
+// Adicionar grupos ao mapa (mantido igual)
+Object.values(grupos).forEach(grupo => grupo.addTo(mapa));
 
-// Adicionar ao mapa
-grupos.QG_TCHA.addTo(mapa);
-grupos.turistico.addTo(mapa);
-grupos.patrocinio.addTo(mapa);
-grupos.placasestatuas.addTo(mapa);
-
-// Controle de camadas
+// 8. Controles do mapa (mantido igual)
 const overlayMaps = {
   "QG TCHÁ": grupos.QG_TCHA,
   "Turísticos": grupos.turistico,
@@ -157,167 +293,17 @@ document.getElementById("filtro").addEventListener("keyup", function () {
 const campoFiltro = document.getElementById("filtro");
 const botaoLimpar = document.getElementById("limpar-filtro");
 
-// Mostrar ou esconder o botão conforme digita
-campoFiltro.addEventListener("input", function () {
-  botaoLimpar.style.display = this.value.length > 0 ? "block" : "none";
-});
-
-// Clicar no ❌ limpa o campo e reaplica o filtro
-botaoLimpar.addEventListener("click", function () {
-  campoFiltro.value = "";
-  botaoLimpar.style.display = "none";
-  campoFiltro.dispatchEvent(new Event("keyup")); // reaplica o filtro
-});
-
-
-// Ícones de veículos
-const iconeCarro = L.icon({ iconUrl: 'imagens/carro.png', iconSize: [32, 32], iconAnchor: [16, 32] });
-const iconeMoto = L.icon({ iconUrl: 'imagens/moto.png', iconSize: [32, 32], iconAnchor: [16, 32] });
-
-const veiculosDinamicos = [
-  { tipo: "carro", coord: [-25.7720, -49.7120], marcador: null },
-  { tipo: "moto", coord: [-25.7740, -49.7160], marcador: null }
-];
-
-veiculosDinamicos.forEach(v => {
-  const icon = v.tipo === "carro" ? iconeCarro : iconeMoto;
-  v.marcador = L.marker(v.coord, { icon }).addTo(mapa);
-});
-
-// Movimento aleatório a cada 2s
-setInterval(() => {
-  veiculosDinamicos.forEach(v => {
-    v.coord[0] += (Math.random() - 0.5) * 0.0005;
-    v.coord[1] += (Math.random() - 0.5) * 0.0005;
-    v.marcador.setLatLng(v.coord);
-  });
-}, 2000);
-// Ícone do usuário baseado na escolha
-const tipoUsuario = localStorage.getItem("tipoUsuario") || "visitante";
-const nomeUsuario = localStorage.getItem("nomeUsuario") || "Usuário"; // Recupera o nome
-let marcadorUsuario = null;
-
-if ("geolocation" in navigator) {
-    navigator.geolocation.watchPosition(
-        (pos) => {
-            const lat = pos.coords.latitude;
-            const lng = pos.coords.longitude;
-
-            if (!marcadorUsuario) {
-                let iconeUsuario;
-
-                if (tipoUsuario === "carro") {
-                    iconeUsuario = L.icon({
-                        iconUrl: 'imagens/carro.png',
-                        iconSize: [32, 32],
-                        iconAnchor: [16, 32]
-                    });
-                } else if (tipoUsuario === "moto") {
-                    iconeUsuario = L.icon({
-                        iconUrl: 'imagens/moto.png',
-                        iconSize: [32, 32],
-                        iconAnchor: [16, 32]
-                    });
-                } else {
-                    iconeUsuario = L.divIcon({
-                        html: `<div style="background:blue; width:14px; height:14px; border-radius:50%; border:2px solid white"></div>`
-                    });
-                }
-
-                // Use crases para interpolação de string
-                marcadorUsuario = L.marker([lat, lng], { icon: iconeUsuario }).addTo(mapa).bindPopup(`<b>${nomeUsuario}</b>`);
-                mapa.setView([lat, lng], 16);
-            } else {
-                marcadorUsuario.setLatLng([lat, lng]);
-            }
-        },
-        (erro) => console.error("Erro ao obter localização:", erro),
-        { enableHighAccuracy: true }
-    );
-}
+// 10. Menu lateral (mantido igual)
 const toggleButton = document.getElementById('toggle-menu');
 const aside = document.querySelector('aside');
 
 toggleButton.addEventListener('click', () => {
   aside.classList.toggle('hidden');
-
-  if (aside.classList.contains('hidden')) {
-    toggleButton.textContent = '☰';
-    toggleButton.style.left = '10px';
-  } else {
-    toggleButton.textContent = '✖';
-    toggleButton.style.left = '260px'; // ao lado do menu
-  }
+  toggleButton.textContent = aside.classList.contains('hidden') ? '☰' : '✖';
+  toggleButton.style.left = aside.classList.contains('hidden') ? '10px' : '260px';
 });
 
-const socket = new WebSocket('wss://' + window.location.host);
-
-let userId = Date.now().toString(); // ID simples
-let userName = localStorage.getItem("nomeUsuario") || "Visitante";
-let userVehicle = localStorage.getItem("tipoUsuario") || "visitante";
-
-socket.addEventListener('open', () => {
-    socket.send(JSON.stringify({
-        type: 'register',
-        id: userId,
-        name: userName,
-        vehicle: userVehicle,
-        lat: 0,
-        lng: 0
-    }));
-});
-
-// Atualizar posição em tempo real
-navigator.geolocation.watchPosition((position) => {
-    socket.send(JSON.stringify({
-        type: 'update',
-        id: userId,
-        name: userName,
-        vehicle: userVehicle,
-        lat: position.coords.latitude,
-        lng: position.coords.longitude
-    }));
-});
-
-
-// Receber posições de todo mundo
-socket.addEventListener('message', (event) => {
-    const data = JSON.parse(event.data);
-    if (data.type === 'locations') {
-        // Aqui você atualiza seu mapa com os dados de todos
-        console.log(data.locations); 
-        // Exemplo: limpar marcadores antigos e criar novos
-    }
-});
-const outrosUsuarios = {};
-
-socket.addEventListener('message', (event) => {
-    const data = JSON.parse(event.data);
-    if (data.type === 'locations') {
-        data.locations.forEach((usuario) => {
-            if (usuario.id === userId) return;
-
-            const coords = [usuario.lat, usuario.lng];
-
-            if (outrosUsuarios[usuario.id]) {
-                outrosUsuarios[usuario.id].setLatLng(coords);
-            } else {
-                let icone;
-                if (usuario.vehicle === "carro") {
-                    icone = iconeCarro;
-                } else if (usuario.vehicle === "moto") {
-                    icone = iconeMoto;
-                } else {
-                    icone = L.divIcon({
-                        html: `<div style="background:red; width:12px; height:12px; border-radius:50%; border:2px solid white"></div>`
-                    });
-                }
-
-                const marker = L.marker(coords, { icon: icone })
-                  .addTo(mapa)
-                  .bindPopup(`<b>${usuario.name}</b> (${usuario.vehicle})`);
-                outrosUsuarios[usuario.id] = marker;
-            }
-        });
-    }
-});
+// 11. Inicialização - ORDEM CORRETA
+setupWebSocket();
+setupGeolocation();
+setInterval(sendPosition, 5000);

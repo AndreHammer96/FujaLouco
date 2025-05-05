@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Escolha sua Modalidade</title>
     <link rel="stylesheet" href="style_modalidade.css">
     <link rel="stylesheet" href="style_fundo.css">
@@ -15,8 +17,8 @@
 
     <div class="modal-box">
         <h2>Qual sua modalidade?</h2>
-        <input type="text" id="nomeUsuario" placeholder="Digite seu nome" style="margin-bottom: 10px;">
-        <select id="tipoUsuario">
+        <input type="text" id="nomeUsuario" placeholder="Digite seu nome" required>
+        <select id="tipoUsuario" required>
             <option value="">-- Selecione --</option>
             <option value="carro">Carro</option>
             <option value="moto">Moto</option>
@@ -26,14 +28,12 @@
     </div>
 
     <script>
-    document.addEventListener("DOMContentLoaded", () => {
-        // Botão "Entrar no mapa"
-        window.entrarMapa = function () {
+        function entrarMapa() {
             const tipoSelecionado = document.getElementById("tipoUsuario").value;
-            const nomeInserido = document.getElementById("nomeUsuario").value;
+            const nomeInserido = document.getElementById("nomeUsuario").value.trim();
 
             if (!tipoSelecionado) {
-                alert("Selecione uma opção para continuar.");
+                alert("Selecione uma modalidade para continuar.");
                 return;
             }
 
@@ -42,15 +42,14 @@
                 return;
             }
 
-            // Salvar os dados no localStorage (para o mapa usar)
+            // Salva os dados (o mapa.html usará esses valores)
             localStorage.setItem("tipoUsuario", tipoSelecionado);
             localStorage.setItem("nomeUsuario", nomeInserido);
 
-            // Ir para o mapa
+            // Redireciona para o mapa
             window.location.href = "mapa.html";
         }
-    });
-</script>
+    </script>
 
 
 
