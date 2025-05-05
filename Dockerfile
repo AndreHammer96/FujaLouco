@@ -2,26 +2,19 @@ FROM python:3.9-slim
 
 WORKDIR /app
 
-# Adicione após o WORKDIR /app
-RUN mkdir -p /app/frontend/imagens
+# 1. Instala dependências básicas
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    && rm -rf /var/lib/apt/lists/*
 
-# Instala dependências
-COPY requirements.txt .
-RUN pip install -r requirements.txt
-
-# Copia TODOS os arquivos
+# 2. Copia TUDO mantendo a estrutura atual
 COPY . .
 
-# Instala servidor HTTP simples para o frontend
-RUN apt-get update && apt-get install -y python3-pip && \
-    pip install fastapi uvicorn aiofiles
+# 3. Garante permissões
+RUN chmod -R 755 /app/frontend
 
-# Porta do Socket.IO (WebSocket)
-EXPOSE 8000
+# 4. Instala dependências Python
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Porta do frontend HTTP
-EXPOSE 8080
-
-# Comando de inicialização
-CMD ["sh", "-c", "python websocket_server.py & cd /app && uvicorn file_server:app --host 0.0.0.0 --port $FRONTEND_PORT"]
-
+# 5. Comando de inicialização
+CMD ["sh", "-c", "python websocket_server.py & uvicorn file_server:app --host 0.0.0.0 --port ${FRONTEND_PORT}"]
