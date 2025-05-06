@@ -1,22 +1,24 @@
-# main.py
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
-import uvicorn
 import threading
-import websocket_server  # seu arquivo com função iniciar_websocket()
+import os
+import websocket_server  # você já tem esse arquivo
+import uvicorn
 
 app = FastAPI()
 
-# monta sua pasta de frontend
+# Serve arquivos da pasta frontend/
 app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
 
-def iniciar_websocket():
-    websocket_server.run_websocket_server()  # você implementa isso no websocket_server.py
+# Roda o WebSocket em uma thread separada
+def start_ws():
+    websocket_server.run_websocket_server()  # sua função WebSocket
 
-# inicia o websocket em uma thread separada
-threading.Thread(target=iniciar_websocket, daemon=True).start()
+threading.Thread(target=start_ws, daemon=True).start()
 
+# Executa FastAPI na porta esperada
 if __name__ == "__main__":
-    import os
-    port = int(os.environ.get("PORT", 8000))
+    port = int(os.environ.get("PORT", 8000))  # Caso a variável PORT não esteja configurada, usa 8000 como fallback
+
+# Inicia o Uvicorn na porta configurada
     uvicorn.run(app, host="0.0.0.0", port=port)
