@@ -1,20 +1,25 @@
 FROM python:3.9-slim
 
+# 1. Configura o diretório de trabalho
 WORKDIR /app
 
-# 1. Instala dependências básicas
+# 2. Instala dependências do sistema
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     && rm -rf /var/lib/apt/lists/*
 
-# 2. Copia TUDO mantendo a estrutura atual
+# 3. Copia TUDO mantendo sua estrutura exata
 COPY . .
 
-# 3. Garante permissões
-RUN chmod -R 755 /app/frontend
+# 4. Verifica a cópia dos arquivos (DEBUG - pode remover depois)
+RUN ls -laR /app/frontend > /app/file_structure.log
 
-# 4. Instala dependências Python
+# 5. Corrige permissões
+RUN chmod -R 755 /app/frontend && \
+    chown -R nobody:nogroup /app
+
+# 6. Instala dependências Python
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 5. Comando de inicialização
-CMD ["sh", "-c", "python websocket_server.py & uvicorn file_server:app --host 0.0.0.0 --port ${FRONTEND_PORT}"]
+# 7. Comando de inicialização otimizado
+CMD ["sh", "-c", "python websocket_server.py & cd /app && uvicorn file_server:app --host 0.0.0.0 --port ${FRONTEND_PORT}"]
