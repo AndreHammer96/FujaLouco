@@ -34,3 +34,7 @@ CMD ["sh", "-c", "python websocket_server.py & cd /app && uvicorn file_server:ap
 RUN echo "Verificando estrutura de arquivos:" && \
     ls -laR /app/frontend > /app/structure.log && \
     cat /app/structure.log
+	
+	
+RUN pip install debugpy && \
+    echo "import debugpy; debugpy.listen(5678); debugpy.wait_for_client()" >> /app/debug.py
