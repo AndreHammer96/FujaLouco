@@ -1,31 +1,39 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.responses import FileResponse
 import os
+import logging
+
+# Configura logs detalhados
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
-# Configuração robusta
+# Caminho absoluto garantido
 frontend_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'frontend')
-print(f"🔍 Frontend path: {frontend_path}")
-print(f"📂 Conteúdo: {os.listdir(frontend_path)}")
+logger.info(f"📍 Pasta frontend: {frontend_path}")
+logger.info(f"📄 Arquivos: {os.listdir(frontend_path)}")
 
-# Serve arquivos estáticos
+# Servidor de arquivos estáticos
 app.mount("/", StaticFiles(directory=frontend_path, html=True), name="frontend")
 
-# Rota fallback
+# Fallback para SPA
 @app.get("/{full_path:path}")
-async def serve_spa(request: Request):
-    return FileResponse(f"{frontend_path}/index.html")
+async def serve_spa():
+    index_path = os.path.join(frontend_path, 'index.html')
+    if not os.path.exists(index_path):
+        logger.error(f"❌ index.html não encontrado em {index_path}")
+    return FileResponse(index_path)
 
 if __name__ == "__main__":
     import uvicorn
     port = int(os.environ.get("FRONTEND_PORT", 3000))
-    print(f"🚀 Iniciando frontend na porta {port}")
+    logger.info(f"🚀 Iniciando servidor na porta {port}")
     uvicorn.run(
-        app,
+        "file_server:app",
         host="0.0.0.0",
         port=port,
-        log_level="debug",
-        reload=True  # Apenas para desenvolvimento
+        reload=True,
+        log_level="info"
     )

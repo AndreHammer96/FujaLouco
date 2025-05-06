@@ -22,6 +22,11 @@ RUN chmod -R 755 /app/frontend && \
 RUN pip install --no-cache-dir -r requirements.txt
 RUN pip install --no-cache-dir --upgrade uvicorn
 
+# Verificação final
+RUN echo "CONTEÚDO DO FRONTEND:" && \
+    find /app/frontend -type f | grep -v ".log" && \
+    echo "-------------------"
+
 # 7. Comando de inicialização otimizado
 CMD ["sh", "-c", "python websocket_server.py & cd /app && uvicorn file_server:app --host 0.0.0.0 --port ${FRONTEND_PORT}"]
 
