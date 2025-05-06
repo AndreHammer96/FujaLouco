@@ -23,3 +23,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # 7. Comando de inicialização otimizado
 CMD ["sh", "-c", "python websocket_server.py & cd /app && uvicorn file_server:app --host 0.0.0.0 --port ${FRONTEND_PORT}"]
+
+# Adicione após o COPY . .
+RUN echo "Verificando estrutura de arquivos:" && \
+    ls -laR /app/frontend > /app/structure.log && \
+    cat /app/structure.log
