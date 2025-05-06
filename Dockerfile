@@ -17,4 +17,4 @@ RUN chmod -R 755 /app/frontend
 RUN pip install --no-cache-dir -r requirements.txt
 
 # 5. Comando otimizado
-CMD ["sh", "-c", "python websocket_server.py & python file_server.py"]
+CMD ["python", "main.py"]
