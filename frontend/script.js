@@ -73,7 +73,7 @@ function setupWebSocket() {
                 marker: L.marker([data.lat, data.lng], {
                     icon: getVehicleIcon(data.vehicle)
                 }).addTo(mapa)
-                .bindPopup(`<b>${data.name}</b> (${data.vehicle})`),
+                .bindPopup(`<b>${data.name}</b> `),
                 lastUpdate: now
             };
             console.log('Novo marcador criado para:', data.id);
@@ -98,7 +98,7 @@ function setupWebSocket() {
 }
 function removerInativos() {
     const now = Date.now();
-    const TIMEOUT = 30000; // 30 segundos sem atualização = inativo
+    const TIMEOUT = 120000; // 30 segundos sem atualização = inativo
 
     Object.keys(outrosUsuarios).forEach(id => {
         if (now - outrosUsuarios[id].lastUpdate > TIMEOUT) {
