@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <link rel="icon" href="imagens/logo.png" type="image/png">
+  <link rel="icon" href="/static/imagens/logo.png" type="image/png">
   <meta charset="UTF-8">
   <title>MAPA TCHA</title>
-  <link rel="stylesheet" href="leaflet/leaflet.css">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="/static/leaflet/leaflet.css">
+  <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
   <header>
     <h1>
-      <img src="imagens/logo2.png" alt="Logo">
+      <img src="/static/imagens/logo2.png" alt="Logo">
       MAPA PROS ENIGMAS
     </h1>
   </header>
@@ -20,26 +20,23 @@
   <main>
     <aside>
       <!-- 🔍 Campo de filtro com botão de limpar -->
-
-	  <div style="position: relative; display: flex; align-items: center;">
-  <div style="position: relative; width: 80%;">
-    <input type="text" id="filtro" placeholder="Buscar referência..." style="width: 75%; padding-right: 30px;">
-    <button id="limpar-filtro" style="
-      position: absolute;
-      right: 8px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: transparent;
-      border: none;
-      font-size: 13px;
-      cursor: pointer;
-      display: none;
-      color: #666;
-    ">❌</button>
-  </div>
-</div>
-
-
+      <div style="position: relative; display: flex; align-items: center;">
+        <div style="position: relative; width: 80%;">
+          <input type="text" id="filtro" placeholder="Buscar referência..." style="width: 75%; padding-right: 30px;">
+          <button id="limpar-filtro" style="
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            font-size: 13px;
+            cursor: pointer;
+            display: none;
+            color: #666;
+          ">❌</button>
+        </div>
+      </div>
       <ul id="lista-referencias">
         <!-- preenchido via script.js -->
       </ul>
@@ -48,39 +45,34 @@
     <div id="map"></div>
   </main>
 
-  <script src="leaflet/leaflet.js"></script>
-  <script src="script.js"></script>
+  <script src="/static/leaflet/leaflet.js"></script>
+  <script src="/static/script.js"></script>
   <div id="centralizar-btn" title="Centralizar no local atual">📍</div>
 
-<script>
-  // Esta variável será atualizada em tempo real com sua posição
-  let posicaoAtual = null;
+  <script>
+    let posicaoAtual = null;
 
-  // Ativamos o rastreamento contínuo ao carregar o mapa
-  navigator.geolocation.watchPosition(
-    (position) => {
-      posicaoAtual = [position.coords.latitude, position.coords.longitude];
-    },
-    (error) => {
-      console.error('Erro ao rastrear localização:', error);
-    },
-    {
-      enableHighAccuracy: false,
-      timeout: 20000,
-      maximumAge: 0
-    }
-  );
+    navigator.geolocation.watchPosition(
+      (position) => {
+        posicaoAtual = [position.coords.latitude, position.coords.longitude];
+      },
+      (error) => {
+        console.error('Erro ao rastrear localização:', error);
+      },
+      {
+        enableHighAccuracy: false,
+        timeout: 20000,
+        maximumAge: 0
+      }
+    );
 
-  // Botão centralizar agora usa a posição já rastreada
-  document.getElementById('centralizar-btn').addEventListener('click', () => {
-    if (posicaoAtual) {
-      mapa.setView(posicaoAtual, 17);
-    } else {
-      alert('Ainda não foi possível obter sua localização. Tente novamente em alguns segundos.');
-    }
-  });
-</script>
-
-
+    document.getElementById('centralizar-btn').addEventListener('click', () => {
+      if (posicaoAtual) {
+        mapa.setView(posicaoAtual, 17);
+      } else {
+        alert('Ainda não foi possível obter sua localização. Tente novamente em alguns segundos.');
+      }
+    });
+  </script>
 </body>
 </html>

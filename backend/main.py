@@ -6,7 +6,7 @@ from fastapi.responses import FileResponse
 app = FastAPI()
 
 # Monta a pasta de arquivos estáticos
-app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
+app.mount("/static", StaticFiles(directory="frontend"), name="static")
 
 @app.get("/")
 async def read_index():

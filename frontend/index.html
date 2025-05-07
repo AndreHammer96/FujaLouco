@@ -4,16 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Escolha sua Modalidade</title>
-    <link rel="stylesheet" href="style_modalidade.css">
-    <link rel="stylesheet" href="style_fundo.css">
+    <link rel="stylesheet" href="/static/style_modalidade.css">
+    <link rel="stylesheet" href="/static/style_fundo.css">
 </head>
 <body>
     <div class="background-container">
-        <img src="imagens/fundo1.jpg" alt="Fundo 1" class="background-image active">
-        <img src="imagens/fundo2.jpg" alt="Fundo 2" class="background-image">
-        <img src="imagens/fundo3.jpg" alt="Fundo 3" class="background-image">
-        <img src="imagens/fundo4.jpg" alt="Fundo 4" class="background-image">
-        </div>
+        <img src="/static/imagens/fundo1.jpg" alt="Fundo 1" class="background-image active">
+        <img src="/static/imagens/fundo2.jpg" alt="Fundo 2" class="background-image">
+        <img src="/static/imagens/fundo3.jpg" alt="Fundo 3" class="background-image">
+        <img src="/static/imagens/fundo4.jpg" alt="Fundo 4" class="background-image">
+    </div>
 
     <div class="modal-box">
         <h2>Qual sua modalidade?</h2>
@@ -47,12 +47,10 @@
             localStorage.setItem("nomeUsuario", nomeInserido);
 
             // Redireciona para o mapa
-            window.location.href = "mapa.html";
+            window.location.href = "/mapa.html";
         }
     </script>
 
-
-
-    <script src="script2.js"></script>
+    <script src="/static/script2.js"></script>
 </body>
 </html>
