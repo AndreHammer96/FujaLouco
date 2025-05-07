@@ -31,8 +31,8 @@ const icones = {
   }),
   visitante: L.icon({
     iconUrl: 'imagens/pessoa.png',
-    iconSize: [32, 32],
-    iconAnchor: [16, 32]
+    iconSize: [24, 24],
+    iconAnchor: [12, 24]
   })
 };
 function getVehicleIcon(vehicleType) {
