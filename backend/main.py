@@ -18,10 +18,9 @@ if __name__ == "__main__":
     import uvicorn
     port = int(os.environ.get("PORT", 8000))
     # ⛔ Não use "backend.main:app", pois você já está dentro da pasta backend
-    uvicorn.run("main:app", host="0.0.0.0", port=port)
+    uvicorn.run("backend.main:app", host="0.0.0.0", port=port)
 
 # Rota WebSocket
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
-    
