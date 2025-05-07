@@ -270,32 +270,52 @@ const overlayMaps = {
 
 L.control.layers(baseMaps, overlayMaps).addTo(mapa);
 
-// Filtro por texto
+// Filtro por texto: locais + usuários
 document.getElementById("filtro").addEventListener("keyup", function () {
   const val = this.value.toLowerCase();
   const palavras = val.split(" ");
 
+  // Filtra LOCAIS
   document.querySelectorAll("#lista-referencias li").forEach(item => {
     const campos = [
-      item.textContent.toLowerCase(),
-      item.textContent2.toLowerCase(),
-      item.textContent3.toLowerCase(),
-      item.textContent4.toLowerCase()
+      item.textContent?.toLowerCase() || "",
+      item.textContent2?.toLowerCase() || "",
+      item.textContent3?.toLowerCase() || "",
+      item.textContent4?.toLowerCase() || ""
     ].join(" ");
 
-    const corresponde = palavras.every(palavra => campos.includes(palavra));
+    const corresponde = palavras.every(p => campos.includes(p));
     item.style.display = corresponde ? "block" : "none";
 
-    // Mostrar ou esconder marcador no mapa
     if (item._marcador) {
       if (corresponde) {
-        item._marcador.addTo(mapa); // mostrar
+        item._marcador.addTo(mapa);
       } else {
-        mapa.removeLayer(item._marcador); // esconder
+        mapa.removeLayer(item._marcador);
       }
     }
   });
+
+  // Filtra USUÁRIOS
+  document.querySelectorAll("#lista-usuarios li").forEach(item => {
+    const nome = item.textContent.toLowerCase();
+    const corresponde = palavras.every(p => nome.includes(p));
+    item.style.display = corresponde ? "block" : "none";
+  });
+
+  // Controla visibilidade dos marcadores dos usuários
+  Object.keys(outrosUsuarios).forEach(id => {
+    const user = outrosUsuarios[id];
+    const nome = user.marker.getPopup().getContent().toLowerCase();
+    const corresponde = palavras.every(p => nome.includes(p));
+    if (corresponde) {
+      user.marker.addTo(mapa);
+    } else {
+      mapa.removeLayer(user.marker);
+    }
+  });
 });
+
 const campoFiltro = document.getElementById("filtro");
 const botaoLimpar = document.getElementById("limpar-filtro");
 
