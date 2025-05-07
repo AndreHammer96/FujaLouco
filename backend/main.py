@@ -16,9 +16,9 @@ async def read_index():
 
 if __name__ == "__main__":
     import uvicorn
-    port = int(os.environ.get("PORT", 8000))
-    # ⛔ Não use "backend.main:app", pois você já está dentro da pasta backend
-    uvicorn.run("backend.main:app", host="0.0.0.0", port=port)
+
+    port = int(os.environ.get("PORT", 8000))  # usa 8000 se PORT não existir
+    uvicorn.run("backend.main:app", host="0.0.0.0", port=port, reload=False)
 
 # Rota WebSocket
 @app.websocket("/ws")
