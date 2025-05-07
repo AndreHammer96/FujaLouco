@@ -58,6 +58,21 @@ function setupWebSocket() {
         if (data.type === 'disconnect') {
             if (outrosUsuarios[data.id]) {
                 mapa.removeLayer(outrosUsuarios[data.id].marker);
+				
+				// Cria item de lista para o usuário
+					let userItem = document.createElement("li");
+					userItem.textContent = data.name;
+					userItem._marcador = outrosUsuarios[data.id].marker;
+					userItem.classList.add("usuario-item");
+					userItem.dataset.userId = data.id;
+					userItem.onclick = () => {
+					  mapa.setView(outrosUsuarios[data.id].marker.getLatLng(), 17);
+					  outrosUsuarios[data.id].marker.openPopup();
+					};
+					document.getElementById("lista-usuarios").appendChild(userItem);
+
+					outrosUsuarios[data.id].listItem = userItem;
+
                 delete outrosUsuarios[data.id];
                 console.log(`Usuário desconectado: ${data.id}`);
             }
@@ -103,7 +118,10 @@ function removerInativos() {
     Object.keys(outrosUsuarios).forEach(id => {
         if (now - outrosUsuarios[id].lastUpdate > TIMEOUT) {
             mapa.removeLayer(outrosUsuarios[id].marker);
-            delete outrosUsuarios[id];
+            if (outrosUsuarios[id].listItem) {
+			  outrosUsuarios[id].listItem.remove();
+			}
+			delete outrosUsuarios[id];
             console.log(`Removido usuário inativo: ${id}`);
         }
     });
@@ -274,7 +292,8 @@ document.getElementById("filtro").addEventListener("keyup", function () {
   const val = this.value.toLowerCase();
   const palavras = val.split(" ");
 
-  document.querySelectorAll("#lista-referencias li").forEach(item => {
+  document.querySelectorAll("#lista-referencias li, #lista-usuarios li").forEach(item => {
+
     const campos = [
       item.textContent.toLowerCase(),
       item.textContent2.toLowerCase(),
@@ -287,12 +306,13 @@ document.getElementById("filtro").addEventListener("keyup", function () {
 
     // Mostrar ou esconder marcador no mapa
     if (item._marcador) {
-      if (corresponde) {
-        item._marcador.addTo(mapa); // mostrar
-      } else {
-        mapa.removeLayer(item._marcador); // esconder
-      }
-    }
+	  if (corresponde) {
+		item._marcador.addTo(mapa);
+	  } else {
+		mapa.removeLayer(item._marcador);
+	  }
+	}
+
   });
 });
 const campoFiltro = document.getElementById("filtro");
