@@ -36,7 +36,7 @@ const icones = {
   })
 };
 function getVehicleIcon(vehicleType) {
-    return icones[vehicleType] || icones.visitante;
+    return icones[vehicleType] ;
 }
 // 4. Função WebSocket mais robusta
 function setupWebSocket() {
@@ -150,7 +150,7 @@ function setupGeolocation() {
 
         if (!marcadorUsuario) {
           marcadorUsuario = L.marker([lat, lng], {
-            icon: icones[tipoUsuario] || icones.visitante
+            icon: icones[tipoUsuario] 
           }).addTo(mapa)
             .bindPopup(`<b>${nomeUsuario}</b>`);
           mapa.setView([lat, lng], 16);
