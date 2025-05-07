@@ -6,7 +6,7 @@ from fastapi.responses import FileResponse
 app = FastAPI()
 
 # Monta a pasta de arquivos estáticos
-app.mount("/static", StaticFiles(directory="frontend"), name="static")
+app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
 
 # Serve o index.html na raiz
 @app.get("/")
