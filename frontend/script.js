@@ -29,7 +29,7 @@ const icones = {
     iconSize: [32, 32],
     iconAnchor: [16, 32]
   }),
-  visitante: L.divIcon({
+  visitante: L.icon({
     iconUrl: 'imagens/pessoa.png',
     iconSize: [32, 32],
     iconAnchor: [16, 32]
