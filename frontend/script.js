@@ -315,6 +315,26 @@ const overlayMaps = {
 
 L.control.layers(baseMaps, overlayMaps).addTo(mapa);
 
+// Atualiza visibilidade da lista de acordo com o controle de camadas
+mapa.on('overlayadd', function (e) {
+  const tipoGrupo = Object.keys(overlayMaps).find(key => overlayMaps[key] === e.layer);
+  atualizarListaPorTipo(tipoGrupo, true);
+});
+
+mapa.on('overlayremove', function (e) {
+  const tipoGrupo = Object.keys(overlayMaps).find(key => overlayMaps[key] === e.layer);
+  atualizarListaPorTipo(tipoGrupo, false);
+});
+
+function atualizarListaPorTipo(tipo, mostrar) {
+  document.querySelectorAll("#lista-referencias li").forEach(item => {
+    // Só afeta locais fixos (itens com textContent3 definido e sem '[M]')
+    if (item.textContent3 === tipo && !item.textContent.startsWith("[M]")) {
+      item.style.display = mostrar ? "block" : "none";
+    }
+  });
+}
+
 // Filtro por texto
 document.getElementById("filtro").addEventListener("keyup", function () {
   const val = this.value.toLowerCase();
@@ -323,9 +343,9 @@ document.getElementById("filtro").addEventListener("keyup", function () {
   document.querySelectorAll("#lista-referencias li").forEach(item => {
     const campos = [
       item.textContent.toLowerCase(),
-      item.textContent2.toLowerCase(),
-      item.textContent3.toLowerCase(),
-      item.textContent4.toLowerCase()
+      item.textContent2?.toLowerCase() || "",
+      item.textContent3?.toLowerCase() || "",
+      item.textContent4?.toLowerCase() || ""
     ].join(" ");
 
     const corresponde = palavras.every(palavra => campos.includes(palavra));
@@ -341,6 +361,7 @@ document.getElementById("filtro").addEventListener("keyup", function () {
     }
   });
 });
+
 const campoFiltro = document.getElementById("filtro");
 const botaoLimpar = document.getElementById("limpar-filtro");
 
