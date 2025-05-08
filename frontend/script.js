@@ -40,74 +40,97 @@ function getVehicleIcon(vehicleType) {
 }
 // 4. Função WebSocket mais robusta
 function setupWebSocket() {
-    // Conexão dinâmica que funciona em qualquer ambiente
-    const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
-    const host = window.location.host;
-    const wsUrl = protocol + host + '/ws';
-    
-    socket = new WebSocket(wsUrl);
+  const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+  const host = window.location.host;
+  const wsUrl = protocol + host + '/ws';
 
-    socket.onopen = () => {
-        console.log('Conectado ao servidor WebSocket');
-        sendPosition();
-    };
+  socket = new WebSocket(wsUrl);
 
-    socket.onmessage = (event) => {
+  socket.onopen = () => {
+    console.log('Conectado ao servidor WebSocket');
+    sendPosition();
+  };
+
+  socket.onmessage = (event) => {
     try {
-        const data = JSON.parse(event.data);
-        
-        if (data.type === 'disconnect') {
-            if (outrosUsuarios[data.id]) {
-                mapa.removeLayer(outrosUsuarios[data.id].marker);
-                delete outrosUsuarios[data.id];
-                console.log(`Usuário desconectado: ${data.id}`);
-            }
-            return;
-        }
+      const data = JSON.parse(event.data);
 
-        if (data.id === userId) return;
-        
-        const now = Date.now();
-        
-        if (!outrosUsuarios[data.id]) {
-            outrosUsuarios[data.id] = {
-                marker: L.marker([data.lat, data.lng], {
-                    icon: getVehicleIcon(data.vehicle)
-                }).addTo(mapa)
-                .bindPopup(`<b>${data.name}</b> `),
-                lastUpdate: now
-            };
-            console.log('Novo marcador criado para:', data.id);
-        } else {
-            outrosUsuarios[data.id].marker.setLatLng([data.lat, data.lng]);
-            outrosUsuarios[data.id].lastUpdate = now;
-            console.log('Marcador atualizado para:', data.id);
+      if (data.type === 'disconnect') {
+        if (outrosUsuarios[data.id]) {
+          mapa.removeLayer(outrosUsuarios[data.id].marker);
+          if (outrosUsuarios[data.id].listaItem) {
+            outrosUsuarios[data.id].listaItem.remove();
+          }
+          delete outrosUsuarios[data.id];
+          console.log(`Usuário desconectado: ${data.id}`);
         }
+        return;
+      }
+
+      if (data.id === userId) return;
+
+      const now = Date.now();
+
+      if (!outrosUsuarios[data.id]) {
+        const marker = L.marker([data.lat, data.lng], {
+          icon: getVehicleIcon(data.vehicle)
+        }).addTo(mapa).bindPopup(`<b>${data.name}</b>`);
+
+        const item = document.createElement("li");
+        item.textContent = data.name;
+        item.textContent2 = "usuário conectado";
+        item.textContent3 = data.vehicle;
+        item.textContent4 = "";
+        item._marcador = marker;
+        item.dataset.tipo = "usuario";
+
+        item.onclick = () => {
+          mapa.setView([data.lat, data.lng], 17);
+          marker.openPopup();
+        };
+
+        document.getElementById("lista-referencias").appendChild(item);
+
+        outrosUsuarios[data.id] = {
+          marker: marker,
+          lastUpdate: now,
+          listaItem: item
+        };
+        console.log('Novo marcador criado para:', data.id);
+      } else {
+        outrosUsuarios[data.id].marker.setLatLng([data.lat, data.lng]);
+        outrosUsuarios[data.id].marker.bindPopup(`<b>${data.name}</b>`);
+        outrosUsuarios[data.id].lastUpdate = now;
+        console.log('Marcador atualizado para:', data.id);
+      }
     } catch (e) {
-        console.error('Erro ao processar mensagem:', e);
+      console.error('Erro ao processar mensagem:', e);
     }
-};
+  };
 
-    socket.onerror = (error) => {
-        console.error('Erro no WebSocket:', error);
-    };
+  socket.onerror = (error) => {
+    console.error('Erro no WebSocket:', error);
+  };
 
-    socket.onclose = () => {
-        console.log('Conexão WebSocket fechada. Reconectando em 5s...');
-        setTimeout(setupWebSocket, 5000);
-    };
+  socket.onclose = () => {
+    console.log('Conexão WebSocket fechada. Reconectando em 5s...');
+    setTimeout(setupWebSocket, 5000);
+  };
 }
-function removerInativos() {
-    const now = Date.now();
-    const TIMEOUT = 120000; // 30 segundos sem atualização = inativo
 
-    Object.keys(outrosUsuarios).forEach(id => {
-        if (now - outrosUsuarios[id].lastUpdate > TIMEOUT) {
-            mapa.removeLayer(outrosUsuarios[id].marker);
-            delete outrosUsuarios[id];
-            console.log(`Removido usuário inativo: ${id}`);
-        }
-    });
+function removerInativos() {
+  const now = Date.now();
+  const TIMEOUT = 120000; //remover usuarios a cada 120 segundos
+  Object.keys(outrosUsuarios).forEach(id => {
+    if (now - outrosUsuarios[id].lastUpdate > TIMEOUT) {
+      mapa.removeLayer(outrosUsuarios[id].marker);
+      if (outrosUsuarios[id].listaItem) {
+        outrosUsuarios[id].listaItem.remove();
+      }
+      delete outrosUsuarios[id];
+      console.log(`Removido usuário inativo: ${id}`);
+    }
+  });
 }
 
 // Verifica a cada 10 segundos
@@ -204,14 +227,14 @@ const locais = [
 { nome:"Linha do trem", coord:[-25.760303870672747, -49.73364022694987], tipo: "placasestatuas", descricao: "Rodovia do Xisto", tags: "rodovia do xisto trem vagao ferro linha ferrea"},
 { nome:"Passarela BR", coord:[-25.757324308865858, -49.73024510326732], tipo: "placasestatuas", descricao: "Passarela na Rod Xisto", tags: "escola emilia magalhaes ferreira do amaral Passarela amarelo grade bosch rodolapa intec agricola metalurgica rodovia do xisto"},
 { nome:"Placa Memoria Ferroviaria", coord:[-25.76780925262605, -49.73840143485134], tipo: "placasestatuas", descricao: "Placa", tags: "A memória é a consciencia inserida ao tempo. Fernando Pessoa. Inauguração do centro de memoria ferroviaria. Sebastião pires furiatti 31 agosto 2017 e recuperação da estação ferroviaria da lapa obra de uma parceria entre prefeitura municipal da lapa e exercio brasileir oo funcionamento sera o apoio do iphanpr instituto do patrimonio historico e artistico nacional, 10ª sup. regiona pr  IHGPR institulo historico geografico do parana ABPF associação brasileira da preservacao ferroviaria "},
-{ nome:"Placa 2ª Guerra mundial", coord:[-25.771187310332955, -49.71655872062561], tipo: "placasestatuas", descricao: "Lapeanos guerra", tags: "Lapeanos que há 45 anos lutaram na europa, em defesa do brasil e pela liberdade no mundo 08 maio 08/05 1990 André Bill Hammerschmidt João Maria Mateus Siben Pinheiro Silva da simborski ukan vieira de oliveira ferreira de lima vaz padilha joaquin josé antonio dos santos berberino dequech josé cardoso oliveira dubiel halaiko kochinski lourenço pimentel pichibonski prestes colaço amaral juvenal juvencio lauro amaral silveira ludovico belinoski kochiba rodrigues ookunski prince sahia diniz ferreira iurkiv pires de lima buen farias padrilha conçalves sebastiao pedro paulo namur miguel"},
-];
+{ nome:"Placa 2ª Guerra mundial", coord:[-25.771187310332955, -49.71655872062561], tipo: "placasestatuas", descricao: "Lapeanos guerra", tags: "Lapeanos que há 45 anos lutaram na europa, em defesa do brasil e pela liberdade no mundo 08 maio 08/05 1990 André Bill Hammerschmidt João Maria Mateus Siben Pinheiro Silva da simborski ukan vieira de oliveira ferreira de lima vaz padilha joaquin josé antonio dos santos berberino dequech josé cardoso oliveira dubiel halaiko kochinski lourenço pimentel pichibonski prestes colaço amaral juvenal juvencio lauro amaral silveira ludovico belinoski kochiba rodrigues ookunski prince sahia diniz ferreira iurkiv pires de lima buen farias padrilha conçalves sebastiao pedro paulo namur miguel"}];
 
 const grupos = {
   QG_TCHA: L.layerGroup(),
   turistico: L.layerGroup(),
   patrocinio: L.layerGroup(),
-  placasestatuas: L.layerGroup()
+  placasestatuas: L.layerGroup(),
+  pontoest: L.layerGroup()
 };
 
 const iconesPorTipo = {
@@ -234,6 +257,11 @@ const iconesPorTipo = {
     iconUrl: 'imagens/pin4.png',
     iconSize: [13, 18],
     iconAnchor: [13, 13]
+  }),
+  pontoest: L.icon({
+    iconUrl: 'imagens/pin5.png',
+    iconSize: [22, 30],
+    iconAnchor: [16, 32]
   })
 };
 
@@ -265,57 +293,38 @@ const overlayMaps = {
   "QG TCHÁ": grupos.QG_TCHA,
   "Turísticos": grupos.turistico,
   "Patrocinadores": grupos.patrocinio,
-  "Placas/Estatuas": grupos.placasestatuas
+  "Placas/Estatuas": grupos.placasestatuas,
+  "Pontos Estratégicos": grupos.pontoest
 };
 
 L.control.layers(baseMaps, overlayMaps).addTo(mapa);
 
-// Filtro por texto: locais + usuários
+// Filtro por texto
 document.getElementById("filtro").addEventListener("keyup", function () {
   const val = this.value.toLowerCase();
   const palavras = val.split(" ");
 
-  // Filtra LOCAIS
   document.querySelectorAll("#lista-referencias li").forEach(item => {
     const campos = [
-      item.textContent?.toLowerCase() || "",
-      item.textContent2?.toLowerCase() || "",
-      item.textContent3?.toLowerCase() || "",
-      item.textContent4?.toLowerCase() || ""
+      item.textContent.toLowerCase(),
+      item.textContent2.toLowerCase(),
+      item.textContent3.toLowerCase(),
+      item.textContent4.toLowerCase()
     ].join(" ");
 
-    const corresponde = palavras.every(p => campos.includes(p));
+    const corresponde = palavras.every(palavra => campos.includes(palavra));
     item.style.display = corresponde ? "block" : "none";
 
+    // Mostrar ou esconder marcador no mapa
     if (item._marcador) {
       if (corresponde) {
-        item._marcador.addTo(mapa);
+        item._marcador.addTo(mapa); // mostrar
       } else {
-        mapa.removeLayer(item._marcador);
+        mapa.removeLayer(item._marcador); // esconder
       }
     }
   });
-
-  // Filtra USUÁRIOS
-  document.querySelectorAll("#lista-usuarios li").forEach(item => {
-    const nome = item.textContent.toLowerCase();
-    const corresponde = palavras.every(p => nome.includes(p));
-    item.style.display = corresponde ? "block" : "none";
-  });
-
-  // Controla visibilidade dos marcadores dos usuários
-  Object.keys(outrosUsuarios).forEach(id => {
-    const user = outrosUsuarios[id];
-    const nome = user.marker.getPopup().getContent().toLowerCase();
-    const corresponde = palavras.every(p => nome.includes(p));
-    if (corresponde) {
-      user.marker.addTo(mapa);
-    } else {
-      mapa.removeLayer(user.marker);
-    }
-  });
 });
-
 const campoFiltro = document.getElementById("filtro");
 const botaoLimpar = document.getElementById("limpar-filtro");
 
