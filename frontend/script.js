@@ -50,11 +50,25 @@ function setupWebSocket() {
     console.log('Conectado ao servidor WebSocket');
     sendPosition();
   };
+  setInterval(() => {
+    if (socket?.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify({
+            type: 'ping',
+            id: userId
+        }));
+    }
+}, 30000); // a cada 30 segundos
 
   socket.onmessage = (event) => {
     try {
       const data = JSON.parse(event.data);
-
+		if (data.type === 'ping') {
+			if (data.id !== userId && outrosUsuarios[data.id]) {
+				outrosUsuarios[data.id].lastUpdate = Date.now();
+			}
+			return; // Não precisa processar mais nada
+		}
+		
       if (data.type === 'disconnect') {
         if (outrosUsuarios[data.id]) {
           mapa.removeLayer(outrosUsuarios[data.id].marker);
