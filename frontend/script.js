@@ -315,52 +315,55 @@ const overlayMaps = {
 
 L.control.layers(baseMaps, overlayMaps).addTo(mapa);
 
-// Atualiza visibilidade da lista de acordo com o controle de camadas
+// Guardar camadas visíveis
+let camadasVisiveis = new Set(Object.keys(overlayMaps)); // Inicialmente todas visíveis
+
 mapa.on('overlayadd', function (e) {
   const tipoGrupo = Object.keys(overlayMaps).find(key => overlayMaps[key] === e.layer);
-  atualizarListaPorTipo(tipoGrupo, true);
+  if (tipoGrupo) camadasVisiveis.add(tipoGrupo);
+  aplicarFiltro();
 });
 
 mapa.on('overlayremove', function (e) {
   const tipoGrupo = Object.keys(overlayMaps).find(key => overlayMaps[key] === e.layer);
-  atualizarListaPorTipo(tipoGrupo, false);
+  if (tipoGrupo) camadasVisiveis.delete(tipoGrupo);
+  aplicarFiltro();
 });
 
-function atualizarListaPorTipo(tipo, mostrar) {
+// Filtro por texto
+document.getElementById("filtro").addEventListener("keyup", aplicarFiltro);
+
+function aplicarFiltro() {
+  const val = document.getElementById("filtro").value.toLowerCase();
+  const palavras = val.split(" ");
+
   document.querySelectorAll("#lista-referencias li").forEach(item => {
-    // Só afeta locais fixos (itens com textContent3 definido e sem '[M]')
-    if (item.textContent3 === tipo && !item.textContent.startsWith("[M]")) {
-      item.style.display = mostrar ? "block" : "none";
+    const nome = item.textContent.toLowerCase();
+    const campo2 = item.textContent2?.toLowerCase() || "";
+    const campo3 = item.textContent3?.toLowerCase() || "";
+    const campo4 = item.textContent4?.toLowerCase() || "";
+
+    const corresponde = palavras.every(palavra =>
+      (nome + " " + campo2 + " " + campo3 + " " + campo4).includes(palavra)
+    );
+
+    const camadaVisivel = !item.textContent.startsWith("[M]") ? camadasVisiveis.has(item.textContent3) : true;
+
+    const mostrar = corresponde && camadaVisivel;
+
+    item.style.display = mostrar ? "block" : "none";
+
+    // Mostrar ou esconder marcador no mapa
+    if (item._marcador && !item.textContent.startsWith("[M]")) {
+      if (mostrar) {
+        item._marcador.addTo(mapa);
+      } else {
+        mapa.removeLayer(item._marcador);
+      }
     }
   });
 }
 
-// Filtro por texto
-document.getElementById("filtro").addEventListener("keyup", function () {
-  const val = this.value.toLowerCase();
-  const palavras = val.split(" ");
-
-  document.querySelectorAll("#lista-referencias li").forEach(item => {
-    const campos = [
-      item.textContent.toLowerCase(),
-      item.textContent2?.toLowerCase() || "",
-      item.textContent3?.toLowerCase() || "",
-      item.textContent4?.toLowerCase() || ""
-    ].join(" ");
-
-    const corresponde = palavras.every(palavra => campos.includes(palavra));
-    item.style.display = corresponde ? "block" : "none";
-
-    // Mostrar ou esconder marcador no mapa
-    if (item._marcador) {
-      if (corresponde) {
-        item._marcador.addTo(mapa); // mostrar
-      } else {
-        mapa.removeLayer(item._marcador); // esconder
-      }
-    }
-  });
-});
 
 const campoFiltro = document.getElementById("filtro");
 const botaoLimpar = document.getElementById("limpar-filtro");
