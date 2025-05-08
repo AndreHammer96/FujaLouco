@@ -292,7 +292,7 @@ Object.values(grupos).forEach(grupo => grupo.addTo(mapa));
 
 // 8. Controles do mapa (mantido igual)
 const overlayMaps = {
-  "QG TCHÁ": grupos.QG_TCHA,
+  "QG OS TCHÁ": grupos.QG_TCHA,
   "Turísticos": grupos.turistico,
   "Patrocinadores": grupos.patrocinio,
   "Placas/Estatuas": grupos.placasestatuas,
