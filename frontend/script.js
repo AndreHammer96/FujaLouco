@@ -77,7 +77,7 @@ function setupWebSocket() {
         }).addTo(mapa).bindPopup(`<b>${data.name}</b>`);
 
         const item = document.createElement("li");
-        item.textContent = data.name;
+        item.textContent = '[M] ${data.name}';
         item.textContent2 = "usuário conectado";
         item.textContent3 = data.vehicle;
         item.textContent4 = "";
@@ -278,7 +278,7 @@ locais.forEach(local => {
   }
 
   const item = document.createElement("li");
-  item.textContent = local.nome;
+  item.textContent = '[L] ${local.nome}';
   item.textContent2 = local.descricao;
   item.textContent3 = local.tipo;
   item.textContent4 = local.tags;
