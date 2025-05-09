@@ -212,7 +212,19 @@ const locais = [
   { nome: "Monumento ao Tropeiro", coord: [-25.752535, -49.724339], tipo: "turistico", descricao: "Homenagem aos tropeiros." , tags: "tropeiro cavalo passagem"},
   { nome: "Portal dos 250 Anos", coord: [-25.754197, -49.724070], tipo: "turistico", descricao: "Marco dos 250 anos.", tags: "250 idade lapa" },
   { nome: "Casa Vermelha", coord: [-25.767005, -49.718767], tipo: "turistico", descricao: "Arquitetura peculiar.", tags: "antigamente" },
-  { nome: "Praça General Carneiro", coord: [-25.767698474243968, -49.71692353809461], tipo: "turistico", descricao: "Ponto central.", tags: "busto estatua" }];
+  { nome: "Praça General Carneiro", coord: [-25.767698474243968, -49.71692353809461], tipo: "turistico", descricao: "Ponto central.", tags: "busto estatua" },
+  { nome: "Igreja Matriz", coord: [-25.767586119493156, -49.716562389662045], tipo: "turistico", descricao: "Principal igreja.", tags: "pedras"},
+  { nome: "Museu Histórico de Lapa", coord: [-25.768159457291883, -49.717108812509125], tipo: "turistico", descricao: "História local." , tags: "historia"},
+  { nome: "Panteon dos Heróis", coord: [-25.768567239819202, -49.71645188455341], tipo: "turistico", descricao: "Heróis da Revolução.", tags: "herois guerreiros enterrados" },
+  { nome: "Casa Lacerda", coord: [-25.76844829221286, -49.71626514774258], tipo: "turistico", descricao: "Casa histórica." , tags: "nomes sei la"},
+  { nome: "Museu da Moda", coord: [-25.768942143722818, -49.71667512754407], tipo: "turistico", descricao: "Vestimentas antigas.", tags: "moda antigo 1900" },
+  { nome: "Casa da Memória", coord: [-25.768910742536967, -49.71646792690578], tipo: "turistico", descricao: "Memória da cidade." , tags: "memoria"},
+  { nome: "Câmara Municipal", coord: [-25.771448862609812, -49.71643678902009], tipo: "turistico", descricao: "Poder legislativo.", tags: "camara" },
+  { nome: "Quebra Pote", coord: [-25.769394966735444, -49.715193012331085], tipo: "turistico", descricao: "Conflito antigo.", tags: "quebra pote agua brinquedos escorregador banco ponte"},
+  { nome: "Cristo Redentor", coord: [-25.776625061597496, -49.69884784990426], tipo: "turistico", descricao: "Vista panorâmica." , tags: "cristo"},
+  { nome: "Gruta do Monge", coord: [-25.7815849227753, -49.6969123587656], tipo: "turistico", descricao: "Local religioso." , tags: "Gritador coroa santa trilha"},
+  { nome: "Estação Ferroviária", coord: [-25.767843745284207, -49.73845492277281], tipo: "turistico", descricao: "Antiga estação." , tags: "Trem antigo"},
+  { nome: "Estação Eng. Bley", coord: [-25.610691507692664, -49.73723776688024], tipo: "turistico", descricao: "Estação histórica." , tags: "Trem"}];
 
 const grupos = {
   QG_TCHA: L.layerGroup(),
