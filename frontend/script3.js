@@ -234,7 +234,6 @@ const locais = [
   { nome: "Carro05", coord: [-25.76338372819463, -49.71495701994529], tipo: "fixos", descricao: "Ponto estratégico", tags: "ponto estratégico escola colegio" },
   { nome: "Carro01", coord: [-25.753951151378235, -49.723885421177705], tipo: "fixos", descricao: "Ponto estratégico", tags: "ponto estratégico gincana" },
   { nome: "Carro02", coord: [-25.76597165674314, -49.72819539231667], tipo: "fixos", descricao: "Ponto estratégico", tags: "ponto estratégico lucas pao padaria" },
-  { nome: "Mercado Leosir", coord: [-25.761695869178368, -49.729136279152755], tipo: "fixos", descricao: "Ponto estratégico", tags: "ponto estratégico mercado jk juscelino jucelino leosir" },
   { nome: "Carro06", coord: [-25.768263224981514, -49.73492127994326], tipo: "fixos", descricao: "Ponto estratégico", tags: "ponto estratégico estacao" }
   ];
 
