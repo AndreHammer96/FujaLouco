@@ -285,8 +285,8 @@ const iconesPorTipo = {
   }),
   fixos: L.icon({
     iconUrl: 'imagens/pin6.png',
-    iconSize: [22, 30],
-    iconAnchor: [16, 32]
+    iconSize: [24, 24],
+    iconAnchor: [12, 24]
   })
 };
 
