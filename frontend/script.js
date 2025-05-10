@@ -242,15 +242,15 @@ const locais = [
 { nome:"Passarela BR", coord:[-25.757324308865858, -49.73024510326732], tipo: "placasestatuas", descricao: "Passarela na Rod Xisto", tags: "escola emilia magalhaes ferreira do amaral Passarela amarelo grade bosch rodolapa intec agricola metalurgica rodovia do xisto"},
 { nome:"Placa Memoria Ferroviaria", coord:[-25.76780925262605, -49.73840143485134], tipo: "placasestatuas", descricao: "Placa", tags: "A memória é a consciencia inserida ao tempo. Fernando Pessoa. Inauguração do centro de memoria ferroviaria. Sebastião pires furiatti 31 agosto 2017 e recuperação da estação ferroviaria da lapa obra de uma parceria entre prefeitura municipal da lapa e exercio brasileir oo funcionamento sera o apoio do iphanpr instituto do patrimonio historico e artistico nacional, 10ª sup. regiona pr  IHGPR institulo historico geografico do parana ABPF associação brasileira da preservacao ferroviaria "},
 { nome:"Placa 2ª Guerra mundial", coord:[-25.771187310332955, -49.71655872062561], tipo: "placasestatuas", descricao: "Lapeanos guerra", tags: "Lapeanos que há 45 anos lutaram na europa, em defesa do brasil e pela liberdade no mundo 08 maio 08/05 1990 André Bill Hammerschmidt João Maria Mateus Siben Pinheiro Silva da simborski ukan vieira de oliveira ferreira de lima vaz padilha joaquin josé antonio dos santos berberino dequech josé cardoso oliveira dubiel halaiko kochinski lourenço pimentel pichibonski prestes colaço amaral juvenal juvencio lauro amaral silveira ludovico belinoski kochiba rodrigues ookunski prince sahia diniz ferreira iurkiv pires de lima buen farias padrilha conçalves sebastiao pedro paulo namur miguel"},
-{ nome: "Centro Historico", coord: [-25.768877696895192, -49.71688734099888], tipo: "pontoest", descricao: "Ponto estratégico", tags: "ponto estratégico centro lapa prefeitura" },
-{ nome: "Parquinho", coord: [-25.776713687482637, -49.717241849190415], tipo: "pontoest", descricao: "Ponto estratégico", tags: "ponto estratégico parque parquinho avenida" },
-  { nome: "JBS", coord: [-25.768562952762675, -49.70672582394665], tipo: "pontoest", descricao: "Ponto estratégico", tags: "ponto estratégico jbs" },
-  { nome: "Centro Historico", coord: [-25.768877696895192, -49.71688734099888], tipo: "pontoest", descricao: "Ponto estratégico", tags: "ponto estratégico centro lapa prefeitura" },
-  { nome: "Dinamico", coord: [-25.76338372819463, -49.71495701994529], tipo: "pontoest", descricao: "Ponto estratégico", tags: "ponto estratégico escola colegio" },
-  { nome: "Linear", coord: [-25.753951151378235, -49.723885421177705], tipo: "pontoest", descricao: "Ponto estratégico", tags: "ponto estratégico gincana" },
-  { nome: "Lucas Pao", coord: [-25.76597165674314, -49.72819539231667], tipo: "pontoest", descricao: "Ponto estratégico", tags: "ponto estratégico lucas pao padaria" },
-  { nome: "Mercado Leosir", coord: [-25.761695869178368, -49.729136279152755], tipo: "pontoest", descricao: "Ponto estratégico", tags: "ponto estratégico mercado jk juscelino jucelino leosir" },
-  { nome: "Estação", coord: [-25.768263224981514, -49.73492127994326], tipo: "pontoest", descricao: "Ponto estratégico", tags: "ponto estratégico estacao" }
+{ nome: "Centro Historico", coord: [-25.768877696895192, -49.71688734099888], tipo: "fixos", descricao: "Ponto estratégico", tags: "ponto estratégico centro lapa prefeitura" },
+{ nome: "Parquinho", coord: [-25.776713687482637, -49.717241849190415], tipo: "fixos", descricao: "Ponto estratégico", tags: "ponto estratégico parque parquinho avenida" },
+  { nome: "JBS", coord: [-25.768562952762675, -49.70672582394665], tipo: "fixos", descricao: "Ponto estratégico", tags: "ponto estratégico jbs" },
+  { nome: "Centro Historico", coord: [-25.768877696895192, -49.71688734099888], tipo: "fixos", descricao: "Ponto estratégico", tags: "ponto estratégico centro lapa prefeitura" },
+  { nome: "Dinamico", coord: [-25.76338372819463, -49.71495701994529], tipo: "fixos", descricao: "Ponto estratégico", tags: "ponto estratégico escola colegio" },
+  { nome: "Linear", coord: [-25.753951151378235, -49.723885421177705], tipo: "fixos", descricao: "Ponto estratégico", tags: "ponto estratégico gincana" },
+  { nome: "Lucas Pao", coord: [-25.76597165674314, -49.72819539231667], tipo: "fixos", descricao: "Ponto estratégico", tags: "ponto estratégico lucas pao padaria" },
+  { nome: "Mercado Leosir", coord: [-25.761695869178368, -49.729136279152755], tipo: "fixos", descricao: "Ponto estratégico", tags: "ponto estratégico mercado jk juscelino jucelino leosir" },
+  { nome: "Estação", coord: [-25.768263224981514, -49.73492127994326], tipo: "fixos", descricao: "Ponto estratégico", tags: "ponto estratégico estacao" }
 
 ];
 
@@ -259,7 +259,7 @@ const grupos = {
   turistico: L.layerGroup(),
   patrocinio: L.layerGroup(),
   placasestatuas: L.layerGroup(),
-  pontoest: L.layerGroup()
+  fixos: L.layerGroup()
 };
 
 const iconesPorTipo = {
@@ -283,8 +283,8 @@ const iconesPorTipo = {
     iconSize: [13, 18],
     iconAnchor: [13, 13]
   }),
-  pontoest: L.icon({
-    iconUrl: 'imagens/pin5.png',
+  fixos: L.icon({
+    iconUrl: 'imagens/pin6.png',
     iconSize: [22, 30],
     iconAnchor: [16, 32]
   })
@@ -319,7 +319,7 @@ const overlayMaps = {
   "Turísticos": grupos.turistico,
   "Patrocinadores": grupos.patrocinio,
   "Placas/Estatuas": grupos.placasestatuas,
-  "Pontos Estratégicos": grupos.pontoest
+  "Pontos Estratégicos": grupos.fixos
 };
 
 L.control.layers(baseMaps, overlayMaps).addTo(mapa);

@@ -224,14 +224,26 @@ const locais = [
   { nome: "Cristo Redentor", coord: [-25.776625061597496, -49.69884784990426], tipo: "turistico", descricao: "Vista panorâmica." , tags: "cristo"},
   { nome: "Gruta do Monge", coord: [-25.7815849227753, -49.6969123587656], tipo: "turistico", descricao: "Local religioso." , tags: "Gritador coroa santa trilha"},
   { nome: "Estação Ferroviária", coord: [-25.767843745284207, -49.73845492277281], tipo: "turistico", descricao: "Antiga estação." , tags: "Trem antigo"},
-  { nome: "Estação Eng. Bley", coord: [-25.610691507692664, -49.73723776688024], tipo: "turistico", descricao: "Estação histórica." , tags: "Trem"}];
+  { nome: "Estação Eng. Bley", coord: [-25.610691507692664, -49.73723776688024], tipo: "turistico", descricao: "Estação histórica." , tags: "Trem"},
+  
+  
+  { nome: "Carro03", coord: [-25.768877696895192, -49.71688734099888], tipo: "fixos", descricao: "Ponto estratégico", tags: "ponto estratégico centro lapa prefeitura" },
+{ nome: "Carro04", coord: [-25.776713687482637, -49.717241849190415], tipo: "fixos", descricao: "Ponto estratégico", tags: "ponto estratégico parque parquinho avenida" },
+  { nome: "Carro07", coord: [-25.768562952762675, -49.70672582394665], tipo: "fixos", descricao: "Ponto estratégico", tags: "ponto estratégico jbs" },
+  { nome: "Carro03", coord: [-25.768877696895192, -49.71688734099888], tipo: "fixos", descricao: "Ponto estratégico", tags: "ponto estratégico centro lapa prefeitura" },
+  { nome: "Carro05", coord: [-25.76338372819463, -49.71495701994529], tipo: "fixos", descricao: "Ponto estratégico", tags: "ponto estratégico escola colegio" },
+  { nome: "Carro01", coord: [-25.753951151378235, -49.723885421177705], tipo: "fixos", descricao: "Ponto estratégico", tags: "ponto estratégico gincana" },
+  { nome: "Carro02", coord: [-25.76597165674314, -49.72819539231667], tipo: "fixos", descricao: "Ponto estratégico", tags: "ponto estratégico lucas pao padaria" },
+  { nome: "Mercado Leosir", coord: [-25.761695869178368, -49.729136279152755], tipo: "fixos", descricao: "Ponto estratégico", tags: "ponto estratégico mercado jk juscelino jucelino leosir" },
+  { nome: "Carro06", coord: [-25.768263224981514, -49.73492127994326], tipo: "fixos", descricao: "Ponto estratégico", tags: "ponto estratégico estacao" }
+  ];
 
 const grupos = {
   QG_TCHA: L.layerGroup(),
   turistico: L.layerGroup(),
   patrocinio: L.layerGroup(),
   placasestatuas: L.layerGroup(),
-  pontoest: L.layerGroup()
+  fixos: L.layerGroup()
 };
 
 const iconesPorTipo = {
@@ -255,8 +267,8 @@ const iconesPorTipo = {
     iconSize: [13, 18],
     iconAnchor: [13, 13]
   }),
-  pontoest: L.icon({
-    iconUrl: 'imagens/pin5.png',
+  fixos: L.icon({
+    iconUrl: 'imagens/pin6.png',
     iconSize: [22, 30],
     iconAnchor: [16, 32]
   })
@@ -291,7 +303,7 @@ const overlayMaps = {
   "Turísticos": grupos.turistico,
   "Patrocinadores": grupos.patrocinio,
   "Placas/Estatuas": grupos.placasestatuas,
-  "Pontos Estratégicos": grupos.pontoest
+  "Pontos Estratégicos": grupos.fixos
 };
 
 L.control.layers(baseMaps, overlayMaps).addTo(mapa);
